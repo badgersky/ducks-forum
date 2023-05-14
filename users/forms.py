@@ -68,3 +68,11 @@ class LoginForm(AuthenticationForm):
     class Meta:
         model = get_user_model()
         fields = ('username', 'password')
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+
+        if username and not get_user_model().objects.filter(username=username).exists():
+            raise ValidationError(f'No such user, try registering first')
+
+        return username
