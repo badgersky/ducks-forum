@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
@@ -22,6 +21,6 @@ class RegistrationView(View):
             messages.add_message(request,
                                  messages.SUCCESS,
                                  f'Registration Successful, please login')
-            return HttpResponse('registration successful')
+            return redirect(reverse('home:home'))
 
         return render(request, 'users/register.html', {'form': form})
