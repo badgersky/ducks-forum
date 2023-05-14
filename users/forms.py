@@ -4,6 +4,12 @@ from django.core.exceptions import ValidationError
 
 
 class RegistrationForm(forms.ModelForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Username',
+        })
+    )
+
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'placeholder': 'Password',
@@ -35,6 +41,8 @@ class RegistrationForm(forms.ModelForm):
         if username and get_user_model().objects.filter(username=username).exists():
             raise ValidationError(f'Try using different username')
 
+        return username
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
@@ -46,9 +54,9 @@ class RegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data.get('password'))
+        user.is_active = True
 
         if commit:
             user.save()
-            user.is_active = True
 
         return user
