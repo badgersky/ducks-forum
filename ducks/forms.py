@@ -18,4 +18,3 @@ class AddDuckForm(forms.ModelForm):
                   'agility',
                   'intelligence',
                   'charisma')
-        
