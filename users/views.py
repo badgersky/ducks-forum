@@ -58,6 +58,6 @@ class LogoutView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            logout(request.user)
+            logout(request)
 
         return redirect(reverse('home:home'))
