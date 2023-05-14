@@ -9,6 +9,8 @@ class Duck(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='ducks')
     occupied_areas = models.TextField()
+    avg_height = models.IntegerField(validators=[MinValueValidator(0)])
+    avg_weight = models.DecimalField(validators=[MinValueValidator(0)], max_digits=3, decimal_places=1)
     strength = models.DecimalField(validators=[MinValueValidator(0), MaxValueValidator(10.0)],
                                    max_digits=3,
                                    decimal_places=1
