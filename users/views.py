@@ -8,6 +8,7 @@ from users import forms
 
 
 class RegistrationView(View):
+    """Registration View"""
 
     def get(self, request):
         form = forms.RegistrationForm()
@@ -28,6 +29,7 @@ class RegistrationView(View):
 
 
 class LoginView(View):
+    """Login View"""
 
     def get(self, request):
         form = forms.LoginForm()
@@ -52,10 +54,10 @@ class LoginView(View):
 
 
 class LogoutView(View):
+    """Logout View"""
 
     def get(self, request):
         if request.user.is_authenticated:
             logout(request.user)
 
         return redirect(reverse('home:home'))
-    
