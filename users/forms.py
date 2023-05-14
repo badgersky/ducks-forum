@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 
 
 class RegistrationForm(forms.ModelForm):
+    """Registration Form"""
+
     username = forms.CharField(
         widget=forms.TextInput(attrs={
             'placeholder': 'Username',
@@ -28,6 +30,8 @@ class RegistrationForm(forms.ModelForm):
         fields = ('username', 'email', 'first_name', 'last_name', 'password', 'confirm_password')
 
     def clean_confirm_password(self):
+        """validate password confirmation"""
+
         password = self.cleaned_data.get('password')
         confirm_password = self.cleaned_data.get('confirm_password')
 
@@ -37,6 +41,8 @@ class RegistrationForm(forms.ModelForm):
         return confirm_password
 
     def clean_username(self):
+        """validate username"""
+
         username = self.cleaned_data.get('username')
 
         if username and get_user_model().objects.filter(username=username).exists():
@@ -45,6 +51,8 @@ class RegistrationForm(forms.ModelForm):
         return username
 
     def clean_email(self):
+        """validate email"""
+
         email = self.cleaned_data.get('email')
 
         if email and get_user_model().objects.filter(email=email).exists():
@@ -53,6 +61,8 @@ class RegistrationForm(forms.ModelForm):
         return email
 
     def save(self, commit=True):
+        """set user`s password, save user to database"""
+
         user = super().save(commit=False)
         user.set_password(self.cleaned_data.get('password'))
         user.is_active = True
@@ -64,12 +74,15 @@ class RegistrationForm(forms.ModelForm):
 
 
 class LoginForm(AuthenticationForm):
+    """Login Form"""
 
     class Meta:
         model = get_user_model()
         fields = ('username', 'password')
 
     def clean_username(self):
+        """validate if user - username in database"""
+
         username = self.cleaned_data.get('username')
 
         if username and not get_user_model().objects.filter(username=username).exists():
