@@ -21,7 +21,7 @@ class AddDuckView(View):
         return redirect(reverse('users:login'))
 
     def post(self, request):
-        form = forms.AddDuckForm(request.POST)
+        form = forms.AddDuckForm(request.POST, request.FILES)
 
         if form.is_valid():
             duck = form.save(commit=False)
