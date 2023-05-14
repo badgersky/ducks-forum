@@ -10,7 +10,7 @@ class AddDuckForm(forms.ModelForm):
         model = models.Duck
         fields = ('name',
                   'description',
-                  'occupied_areas',
+                  'origin_country',
                   'image',
                   'avg_weight',
                   'strength',
