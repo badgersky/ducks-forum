@@ -12,7 +12,6 @@ class AddDuckForm(forms.ModelForm):
                   'description',
                   'occupied_areas',
                   'image',
-                  'avg_height',
                   'avg_weight',
                   'strength',
                   'agility',
