@@ -6,3 +6,15 @@
     background-color: saddlebrown;
     color: burlywood;
 }
+
+.img-duck-list {
+    width:  250px;
+    height: 250px;
+    object-fit: cover;
+}
+
+.img-duck-details {
+    width:  250px;
+    height: auto;
+}
+

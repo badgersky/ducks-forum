@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    {{ duck.name.title }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="mt-5 mb-3 container text-lg-start" role="group" aria-label="Basic example">
+        {% if owner %}
+            <a href="{% url 'ducks:delete' pk=duck.id %}" class="btn btn-brown">Delete</a>
+            <a href="{% url 'ducks:edit' pk=duck.id %}" class="btn btn-brown">Edit</a>
+        {% endif %}
+        <a href="" class="btn btn-brown">Rate</a>
+    </div>
+    <h3 class="p-2 border-bottom border-black">{{ duck.name.title }}</h3>
+    <div class="container mb-5 text-lg-start">
+        <p>{{ duck.description }}</p>
+    </div>
+    <div class="container pt-5 d-flex justify-content-sm-start">
+        <p>Duck added at: {{ duck.date_at }}</p>
+    </div>
+{% endblock %}
+
+{% block right-side %}
+    {{ block.super }}
+    <div class="border border-black">
+        <div class="m-3">
+            <img src="{{ duck.image.url }}" class="img-duck-details" alt="{{ duck.name }}">
+        </div>
+        <div class="container text-lg-start">
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">INFO</h5>
+            <ul style="list-style-type: none">
+                <li><b>Name:</b> {{ duck.name.title }}</li>
+                <li><b>Origin country:</b> {{ duck.origin_country }}</li>
+                <li><b>Average weight:</b> {{ duck.avg_weight }}</li>
+            </ul>
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">STATS</h5>
+            <ul style="list-style-type: none">
+                <li><b>Strength:</b> {{ duck.strength }}/10</li>
+                <li><b>Agility:</b> {{ duck.agility }}/10</li>
+                <li><b>Intelligence:</b> {{ duck.intelligence }}/10</li>
+                <li><b>Charisma:</b> {{ duck.charisma }}/10</li>
+                <li><b>Overall:</b> {{ overall }}/10</li>
+            </ul>
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">RATE</h5>
+        </div>
+    </div>
+{% endblock %}
