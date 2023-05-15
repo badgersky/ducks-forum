@@ -26,19 +26,17 @@
 
 <div class="container text-center">
     <div class="row">
-        <div class="col-2 m-3">
-            {% block left-side %}{% endblock %}
-        </div>
         <div class="col-8 m-3">
             {% block content %}
 
             {% endblock %}
         </div>
-        <div class="col-2 m-3">
-            {% block right-side %}{% endblock %}
+        <div class="col-3 m-3">
+            {% block right-side %}
+                <img src="{% static 'images/dancing-duck.gif' %}" alt="dancing-duck">
+            {% endblock %}
         </div>
     </div>
 </div>
-
 </body>
 </html>
