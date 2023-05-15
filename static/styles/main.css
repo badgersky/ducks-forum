@@ -13,3 +13,8 @@
     object-fit: cover;
 }
 
+.img-duck-details {
+    width:  250px;
+    height: auto;
+}
+
