@@ -29,6 +29,10 @@ class AddDuckView(View):
             duck.user = request.user
             duck.save()
 
+            messages.add_message(request,
+                                 messages.SUCCESS,
+                                 f'Successfully added duck')
+
             return redirect(reverse('home:home'))
 
         return render(request, 'ducks/add-duck.html', {'form': form})
