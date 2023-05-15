@@ -10,8 +10,10 @@
 {% block content %}
     {{ block.super }}
     <div class="mt-5 mb-3 container text-lg-start" role="group" aria-label="Basic example">
-        <a href="" class="btn btn-brown">Delete</a>
-        <a href="{% url 'ducks:edit' pk=duck.id %}" class="btn btn-brown">Edit</a>
+        {% if owner %}
+            <a href="{% url 'ducks:delete' pk=duck.id %}" class="btn btn-brown">Delete</a>
+            <a href="{% url 'ducks:edit' pk=duck.id %}" class="btn btn-brown">Edit</a>
+        {% endif %}
         <a href="" class="btn btn-brown">Rate</a>
     </div>
     <h3 class="p-2 border-bottom border-black">{{ duck.name.title }}</h3>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Delete Duck
+{% endblock %}
+
+{% block content %}
+    <div class="text-center p-3 border border-black rounded-2">
+        <div class="card-body bg-burlywood">
+            <h5 class="card-title">Are you sure?</h5>
+            <p class="card-text">Duck {{ duck.name.title }} will be deleted, you cannot reverse this action.</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <a href="{% url 'ducks:details' pk=duck.id %}" class="btn me-4 btn-brown">Cancel</a>
+                <button type="submit" class="btn ms-4 btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

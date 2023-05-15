@@ -44,7 +44,7 @@ class ListDucksView(View):
 
     def get(self, request):
         ducks = models.Duck.objects.all()
-        duck_table = [ducks[i:i+3] for i in range(0, len(ducks), 3)]
+        duck_table = [ducks[i:i + 3] for i in range(0, len(ducks), 3)]
 
         return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
 
@@ -117,3 +117,49 @@ class EditDuckView(View):
 
             return redirect(reverse('ducks:list'))
 
+
+class DeleterDuckView(View):
+
+    def get(self, request, pk):
+        if request.user.is_authenticated:
+            try:
+                duck = models.Duck.objects.get(pk=pk)
+            except models.Duck.DoesNotExist:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'Sorry, we lost this duck')
+
+                return redirect(reverse('home:home'))
+
+            if request.user.id == duck.user.id or request.user.is_superuser:
+                return render(request, 'ducks/delete-duck.html', {'duck': duck})
+            else:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'You cannot delete this duck')
+
+                return redirect(reverse('ducks:details', kwargs={'pk': duck.id}))
+
+        messages.add_message(request,
+                             messages.WARNING,
+                             f'If you want to delete this duck, you must login')
+
+        return redirect(reverse('users:login'))
+
+    def post(self, request, pk):
+        try:
+            duck = models.Duck.objects.get(pk=pk)
+        except models.Duck.DoesNotExist:
+            messages.add_message(request,
+                                 messages.WARNING,
+                                 f'Sorry, we lost this duck')
+
+            return redirect(reverse('home:home'))
+
+        duck.delete()
+
+        messages.add_message(request,
+                             messages.SUCCESS,
+                             f'Successfully deleted duck')
+
+        return redirect(reverse('ducks:list'))
