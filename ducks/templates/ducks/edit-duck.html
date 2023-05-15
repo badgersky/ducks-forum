@@ -4,7 +4,7 @@
 {% load crispy_forms_filters %}
 
 {% block title %}
-    Add Duck
+    Edit Duck
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
         <form action="" method="post" class="m-3" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
-            <button class="btn btn-brown" type="submit">Add Duck</button>
+            <button class="btn btn-brown" type="submit">Edit Duck</button>
         </form>
     </div>
 {% endblock %}

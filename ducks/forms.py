@@ -48,6 +48,15 @@ class AddDuckForm(forms.ModelForm):
         duck.name = self.cleaned_data.get('name').lower()
 
         if commit:
-            duck.save()
+            self.save()
 
         return duck
+
+
+class EditDuckForm(AddDuckForm):
+    """class for editing duck"""
+
+    class Meta(AddDuckForm.Meta):
+        fields = ('name',
+                  'description',
+                  'origin_country')

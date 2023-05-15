@@ -34,7 +34,7 @@ class AddDuckView(View):
                                  messages.SUCCESS,
                                  f'Successfully added duck')
 
-            return redirect(reverse('home:home'))
+            return redirect(reverse('ducks:list'))
 
         return render(request, 'ducks/add-duck.html', {'form': form})
 
@@ -73,3 +73,47 @@ class DuckDetailsView(View):
         overall_stats = round(overall_stats, 1)
 
         return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner, 'overall': overall_stats})
+
+
+class EditDuckView(View):
+    """View for editing duck"""
+
+    def get(self, request, pk):
+        try:
+            duck = models.Duck.objects.get(pk=pk)
+        except models.Duck.DoesNotExist:
+            messages.add_message(request,
+                                 messages.WARNING,
+                                 f'Sorry, we lost this duck')
+
+            return redirect(reverse('home:home'))
+
+        form = forms.EditDuckForm(data={'name': duck.name,
+                                        'description': duck.description,
+                                        'origin_country': duck.origin_country})
+        return render(request, 'ducks/edit-duck.html', {'form': form})
+
+    def post(self, request, pk):
+        form = forms.EditDuckForm(request.POST)
+
+        if form.is_valid():
+            try:
+                duck = models.Duck.objects.get(pk=pk)
+            except models.Duck.DoesNotExist:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'Sorry, we lost this duck')
+
+                return redirect(reverse('home:home'))
+
+            duck.name = form.cleaned_data.get('name')
+            duck.description = form.cleaned_data.get('description')
+            duck.origin_country = form.cleaned_data.get('origin_country')
+            duck.save()
+
+            messages.add_message(request,
+                                 messages.SUCCESS,
+                                 f'Successfully edited duck')
+
+            return redirect(reverse('ducks:list'))
+
