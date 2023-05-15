@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Ducks
+{% endblock %}
+
+{% block content %}
+    {% for row in duck_table %}
+        <div class="row justify-content-sm-start mt-5 mb-5">
+            {% for duck in row %}
+                <div class="justify-content-center" style="width: 18rem;">
+                    <img src="{{ duck.image.url }}" class="img-duck-list" alt="{{ duck.name }}">
+                    <div class="card-body mt-2">
+                        <a href="">
+                            <button class="btn btn-brown">{{ duck.name.title }}</button>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}

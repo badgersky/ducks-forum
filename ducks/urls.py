@@ -6,4 +6,5 @@ app_name = 'ducks'
 
 urlpatterns = [
     path('add/', views.AddDuckView.as_view(), name='add'),
+    path('list/', views.ListDucksView.as_view(), name='list')
 ]

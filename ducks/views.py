@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from ducks import forms
+from ducks import forms, models
 
 
 class AddDuckView(View):
@@ -36,3 +36,13 @@ class AddDuckView(View):
             return redirect(reverse('home:home'))
 
         return render(request, 'ducks/add-duck.html', {'form': form})
+
+
+class ListDucksView(View):
+    """lists all ducks with their photos and link to duck-details page"""
+
+    def get(self, request):
+        ducks = models.Duck.objects.all()
+        duck_table = [ducks[i:i+3] for i in range(0, len(ducks), 3)]
+
+        return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
