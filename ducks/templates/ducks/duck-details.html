@@ -10,3 +10,29 @@
 {% block content %}
     <p>{{ duck.name.title }}</p>
 {% endblock %}
+
+{% block right-side %}
+    {{ block.super }}
+    <div class="border border-black">
+        <div class="m-3">
+            <img src="{{ duck.image.url }}" class="img-duck-list" alt="{{ duck.name }}">
+        </div>
+        <div class="container text-lg-start">
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">INFO</h5>
+            <ul style="list-style-type: none">
+                <li><b>Name:</b> {{ duck.name.title }}</li>
+                <li><b>Origin country:</b> {{ duck.origin_country }}</li>
+                <li><b>Average weight:</b> {{ duck.avg_weight }}</li>
+            </ul>
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">STATS</h5>
+            <ul style="list-style-type: none">
+                <li><b>Strength:</b> {{ duck.strength }}/10</li>
+                <li><b>Agility:</b> {{ duck.agility }}/10</li>
+                <li><b>Intelligence:</b> {{ duck.intelligence }}/10</li>
+                <li><b>Charisma:</b> {{ duck.charisma }}/10</li>
+                <li><b>Overall:</b> {{ overall }}/10</li>
+            </ul>
+            <h5 class="mt-3 p-2 text-center border-top border-bottom border-black">RATE</h5>
+        </div>
+    </div>
+{% endblock %}

@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
+from _decimal import Decimal
 
 from ducks import forms, models
 
@@ -67,4 +68,8 @@ class DuckDetailsView(View):
             if request.user.id == duck.user.id or request.user.is_superuser:
                 owner = True
 
-        return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner})
+        overall_stats = ((duck.strength + Decimal(0.2) * duck.avg_weight) +
+                         (duck.agility - (Decimal(0.2) * duck.avg_weight)) + duck.intelligence + duck.charisma) / 4
+        overall_stats = round(overall_stats, 1)
+
+        return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner, 'overall': overall_stats})
