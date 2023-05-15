@@ -14,7 +14,7 @@
                 <div class="justify-content-center" style="width: 18rem;">
                     <img src="{{ duck.image.url }}" class="img-duck-list" alt="{{ duck.name }}">
                     <div class="card-body mt-2">
-                        <a href="">
+                        <a href="{% url 'ducks:details' pk=duck.id %}">
                             <button class="btn btn-brown">{{ duck.name.title }}</button>
                         </a>
                     </div>
