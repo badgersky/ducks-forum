@@ -46,3 +46,25 @@ class ListDucksView(View):
         duck_table = [ducks[i:i+3] for i in range(0, len(ducks), 3)]
 
         return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
+
+
+class DuckDetailsView(View):
+    """displays details about a duck"""
+
+    def get(self, request, pk):
+        try:
+            duck = models.Duck.objects.get(pk=pk)
+        except models.Duck.DoesNotExist:
+            messages.add_message(request,
+                                 messages.WARNING,
+                                 f'Sorry, we lost this duck')
+
+            return redirect(reverse('home:home'))
+
+        owner = False
+
+        if request.user.is_authenticated:
+            if request.user.id == duck.user.id or request.user.is_superuser:
+                owner = True
+
+        return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner})
