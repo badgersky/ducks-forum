@@ -71,7 +71,12 @@ class DuckDetailsView(View):
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
-        return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner, 'overall': overall_stats})
+        rate_form = forms.RateDuckForm()
+
+        return render(request, 'ducks/duck-details.html', {'duck': duck,
+                                                           'owner': owner,
+                                                           'overall': overall_stats,
+                                                           'form': rate_form})
 
 
 class EditDuckView(View):

@@ -14,14 +14,23 @@
             <a href="{% url 'ducks:delete' pk=duck.id %}" class="btn btn-brown">Delete</a>
             <a href="{% url 'ducks:edit' pk=duck.id %}" class="btn btn-brown">Edit</a>
         {% endif %}
-        <a href="" class="btn btn-brown">Rate</a>
     </div>
     <h3 class="p-2 border-bottom border-black">{{ duck.name.title }}</h3>
     <div class="container mb-5 text-lg-start">
         <p>{{ duck.description }}</p>
     </div>
-    <div class="container pt-5 d-flex justify-content-sm-start">
+    <div class="container pt-5 text-lg-start">
         <p>Duck added at: {{ duck.date_at }}</p>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-2 text-lg-start">
+            <form action="/ducks/rate/{{ duck.id }}/" method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-brown">Rate</button>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
