@@ -68,11 +68,9 @@ class EditDuckForm(AddDuckForm):
 
 
 class RateDuckForm(forms.ModelForm):
-    rate = 0.5
     choices = []
     for i in range(1, 11):
-        choices.append((i, rate))
-        rate += 0.5
+        choices.append((i, '\N{white medium star}' * i))
 
     rate = forms.ChoiceField(
         label='Rate Duck',
@@ -82,4 +80,3 @@ class RateDuckForm(forms.ModelForm):
     class Meta:
         model = models.DuckRate
         fields = ('rate',)
-
