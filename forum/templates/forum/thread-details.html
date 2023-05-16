@@ -26,6 +26,12 @@
         </div>
     </div>
     <br>
+    <form action="{% url 'forum:add-comment' pk=thread.id %}" method="post" class="d-inline">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn btn-brown" type="submit">Add Comment</button>
+    </form>
+    <br>
     <div class="p-2 d-flex justify-content-sm-start">
         {% for comment in comments %}
             <div class="p-2">
