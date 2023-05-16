@@ -59,4 +59,9 @@ class EditDuckForm(AddDuckForm):
     class Meta(AddDuckForm.Meta):
         fields = ('name',
                   'description',
-                  'origin_country')
+                  'origin_country',
+                  'avg_weight',
+                  'strength',
+                  'agility',
+                  'intelligence',
+                  'charisma')

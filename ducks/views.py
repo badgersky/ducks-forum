@@ -90,9 +90,15 @@ class EditDuckView(View):
                 return redirect(reverse('home:home'))
 
             if request.user.id == duck.user.id or request.user.is_superuser:
-                form = forms.EditDuckForm(data={'name': duck.name,
-                                                'description': duck.description,
-                                                'origin_country': duck.origin_country})
+                form = forms.EditDuckForm(initial={'name': duck.name,
+                                                   'description': duck.description,
+                                                   'origin_country': duck.origin_country,
+                                                   'avg_weight': duck.avg_weight,
+                                                   'strength': duck.strength,
+                                                   'agility': duck.agility,
+                                                   'intelligence': duck.intelligence,
+                                                   'charisma': duck.charisma,
+                                                   })
 
                 return render(request, 'ducks/edit-duck.html', {'form': form})
             else:
@@ -107,7 +113,7 @@ class EditDuckView(View):
                              f'If you want to edit this duck, you must login')
 
         return redirect(reverse('users:login'))
-        
+
     def post(self, request, pk):
         form = forms.EditDuckForm(request.POST)
 
@@ -124,6 +130,11 @@ class EditDuckView(View):
             duck.name = form.cleaned_data.get('name')
             duck.description = form.cleaned_data.get('description')
             duck.origin_country = form.cleaned_data.get('origin_country')
+            duck.avg_weight = form.cleaned_data.get('avg_weight')
+            duck.strength = form.cleaned_data.get('strength')
+            duck.agility = form.cleaned_data.get('agility')
+            duck.intelligence = form.cleaned_data.get('intelligence')
+            duck.charisma = form.cleaned_data.get('charisma')
             duck.save()
 
             messages.add_message(request,
