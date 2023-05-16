@@ -79,20 +79,35 @@ class EditDuckView(View):
     """View for editing duck"""
 
     def get(self, request, pk):
-        try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
-            messages.add_message(request,
-                                 messages.WARNING,
-                                 f'Sorry, we lost this duck')
+        if request.user.is_authenticated:
+            try:
+                duck = models.Duck.objects.get(pk=pk)
+            except models.Duck.DoesNotExist:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'Sorry, we lost this duck')
 
-            return redirect(reverse('home:home'))
+                return redirect(reverse('home:home'))
 
-        form = forms.EditDuckForm(data={'name': duck.name,
-                                        'description': duck.description,
-                                        'origin_country': duck.origin_country})
-        return render(request, 'ducks/edit-duck.html', {'form': form})
+            if request.user.id == duck.user.id or request.user.is_superuser:
+                form = forms.EditDuckForm(data={'name': duck.name,
+                                                'description': duck.description,
+                                                'origin_country': duck.origin_country})
 
+                return render(request, 'ducks/edit-duck.html', {'form': form})
+            else:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'You cannot edit this duck')
+
+                return redirect(reverse('ducks:details', kwargs={'pk': duck.id}))
+
+        messages.add_message(request,
+                             messages.WARNING,
+                             f'If you want to edit this duck, you must login')
+
+        return redirect(reverse('users:login'))
+        
     def post(self, request, pk):
         form = forms.EditDuckForm(request.POST)
 
