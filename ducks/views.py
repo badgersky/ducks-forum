@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-from _decimal import Decimal
 
 from ducks import forms, models
 
@@ -68,10 +67,22 @@ class DuckDetailsView(View):
             if request.user.id == duck.user.id or request.user.is_superuser:
                 owner = True
 
+        rates = models.DuckRate.objects.filter(duck=duck)
+        rates_values = [rate.rate for rate in rates]
+        duck_rate = sum(rates_values) / len(rates_values)
+        duck_rate = round(duck_rate, 1)
+
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
-        return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner, 'overall': overall_stats})
+        rate_form = forms.RateDuckForm()
+
+        return render(request, 'ducks/duck-details.html', {'duck': duck,
+                                                           'owner': owner,
+                                                           'overall': overall_stats,
+                                                           'form': rate_form,
+                                                           'rate': duck_rate,
+                                                           })
 
 
 class EditDuckView(View):
@@ -194,3 +205,42 @@ class DeleteDuckView(View):
                              f'Successfully deleted duck')
 
         return redirect(reverse('ducks:list'))
+
+
+class RateDuckView(View):
+
+    def post(self, request, pk):
+        try:
+            duck = models.Duck.objects.get(pk=pk)
+        except models.Duck.DoesNotExist:
+            messages.add_message(request,
+                                 messages.WARNING,
+                                 f'Sorry, we lost this duck')
+
+            return redirect(reverse('home:home'))
+
+        if request.user.is_authenticated:
+            form = forms.RateDuckForm(request.POST)
+
+            if form.is_valid():
+                if models.DuckRate.objects.filter(user=request.user, duck=duck).exists():
+                    messages.add_message(request,
+                                         messages.WARNING,
+                                         f'You have already rated {duck.name.title()}')
+
+                    return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+
+                rate = form.save(commit=False)
+
+                rate.user = request.user
+                rate.duck = duck
+
+                form.save()
+
+                return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+
+        messages.add_message(request,
+                             messages.WARNING,
+                             f'Login before rating {duck.name.title()}')
+
+        return redirect(reverse('users:login'))
