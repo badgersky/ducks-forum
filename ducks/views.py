@@ -67,6 +67,11 @@ class DuckDetailsView(View):
             if request.user.id == duck.user.id or request.user.is_superuser:
                 owner = True
 
+        rates = models.DuckRate.objects.filter(duck=duck)
+        rates_values = [rate.rate for rate in rates]
+        duck_rate = sum(rates_values) / len(rates_values)
+        duck_rate = round(duck_rate, 1)
+
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
@@ -75,7 +80,9 @@ class DuckDetailsView(View):
         return render(request, 'ducks/duck-details.html', {'duck': duck,
                                                            'owner': owner,
                                                            'overall': overall_stats,
-                                                           'form': rate_form})
+                                                           'form': rate_form,
+                                                           'rate': duck_rate,
+                                                           })
 
 
 class EditDuckView(View):
