@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    {{ thread.subject }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="border border-black rounded-2">
+        <div class="p-2 d-flex justify-content-between" role="group" aria-label="Basic example">
+            <p class="d-inline me-5">Thread started by: <b>{{ thread.creator }}</b></p>
+            {% if user.id == thread.creator.id or user.is_superuser %}
+                <a href="" class="btn btn-brown">Delete</a>
+            {% endif %}
+        </div>
+        <h3 class="p-2 border-top border-bottom border-black">{{ thread.subject.title }}</h3>
+        <div class="container mb-2 text-lg-start">
+            <p>{{ thread.content }}</p>
+        </div>
+        <div class="container pt-5 d-flex justify-content-between">
+            <p>Thread started at: {{ thread.date_at }}</p>
+            <p>Likes: {{ thread.likes }}</p>
+        </div>
+    </div>
+    <br>
+    <div class="p-2 d-flex justify-content-sm-start">
+        {% for comment in comments %}
+            <div class="p-2">
+                <p class="d-inline me-5"><b>{{ comment.user }}</b></p>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p>No comments</p>
+        {% endfor %}
+    </div>
+{% endblock %}

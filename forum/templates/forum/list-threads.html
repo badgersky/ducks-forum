@@ -15,7 +15,7 @@
             <div class="card-body">
                 <h5 class="card-title">Created by: {{ thread.creator.username }}</h5>
                 <p class="card-text">Created at: {{ thread.date_at }}</p>
-                <a href="" class="btn btn-brown">See thread</a>
+                <a href="{% url 'forum:details' pk=thread.id %}" class="btn btn-brown">See thread</a>
             </div>
         </div>
     {% empty %}
