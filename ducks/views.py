@@ -143,6 +143,12 @@ class EditDuckView(View):
 
             return redirect(reverse('ducks:list'))
 
+        messages.add_message(request,
+                             messages.WARNING,
+                             f'No edits have been made')
+
+        return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+
 
 class DeleteDuckView(View):
     """View for deleting duck"""
