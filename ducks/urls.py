@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:pk>/', views.DuckDetailsView.as_view(), name='details'),
     path('edit/<int:pk>/', views.EditDuckView.as_view(), name='edit'),
     path('delete/<int:pk>/', views.DeleteDuckView.as_view(), name='delete'),
+    path('rate/<int:pk>/', views.RateDuckView.as_view(), name='rate'),
 ]
