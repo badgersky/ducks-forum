@@ -68,9 +68,12 @@ class DuckDetailsView(View):
                 owner = True
 
         rates = models.DuckRate.objects.filter(duck=duck)
-        rates_values = [rate.rate for rate in rates]
-        duck_rate = sum(rates_values) / len(rates_values)
-        duck_rate = round(duck_rate, 1)
+        if rates:
+            rates_values = [rate.rate for rate in rates]
+            duck_rate = sum(rates_values) / len(rates_values)
+            duck_rate = round(duck_rate, 1)
+        else:
+            duck_rate = 0
 
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
