@@ -9,5 +9,5 @@ urlpatterns = [
     path('list/', views.ListDucksView.as_view(), name='list'),
     path('<int:pk>/', views.DuckDetailsView.as_view(), name='details'),
     path('edit/<int:pk>/', views.EditDuckView.as_view(), name='edit'),
-    path('delete/<int:pk>/', views.DeleterDuckView.as_view(), name='delete'),
+    path('delete/<int:pk>/', views.DeleteDuckView.as_view(), name='delete'),
 ]

@@ -118,7 +118,8 @@ class EditDuckView(View):
             return redirect(reverse('ducks:list'))
 
 
-class DeleterDuckView(View):
+class DeleteDuckView(View):
+    """View for deleting duck"""
 
     def get(self, request, pk):
         if request.user.is_authenticated:
