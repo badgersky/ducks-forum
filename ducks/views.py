@@ -68,8 +68,7 @@ class DuckDetailsView(View):
             if request.user.id == duck.user.id or request.user.is_superuser:
                 owner = True
 
-        overall_stats = ((duck.strength + Decimal(0.2) * duck.avg_weight) +
-                         (duck.agility - (Decimal(0.2) * duck.avg_weight)) + duck.intelligence + duck.charisma) / 4
+        overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
         return render(request, 'ducks/duck-details.html', {'duck': duck, 'owner': owner, 'overall': overall_stats})
@@ -97,8 +96,7 @@ class EditDuckView(View):
                                                    'strength': duck.strength,
                                                    'agility': duck.agility,
                                                    'intelligence': duck.intelligence,
-                                                   'charisma': duck.charisma,
-                                                   })
+                                                   'charisma': duck.charisma})
 
                 return render(request, 'ducks/edit-duck.html', {'form': form})
             else:
