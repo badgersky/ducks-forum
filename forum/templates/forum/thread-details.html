@@ -27,11 +27,13 @@
         </div>
     </div>
     <br>
-    <form action="{% url 'forum:add-comment' pk=thread.id %}" method="post" class="d-inline">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <button class="btn btn-brown" type="submit">Add Comment</button>
-    </form>
+    {% if user.is_authenticated %}
+        <form action="{% url 'forum:add-comment' pk=thread.id %}" method="post" class="d-inline">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button class="btn btn-brown" type="submit">Add Comment</button>
+        </form>
+    {% endif %}
     <br>
     {% for comment in comments %}
         <div class="p-2 border border-black rounded-2 mb-2 mt-2">
