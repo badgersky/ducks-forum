@@ -8,3 +8,9 @@ class DisplayThreadsView(ListView):
     model = models.Thread
     template_name = 'forum/list-threads.html'
     context_object_name = 'threads'
+
+
+class CreateThreadView(CreateView):
+    model = models.Thread
+    template_name = 'forum/create-thread.html'
+    fields = ('subject', 'content')

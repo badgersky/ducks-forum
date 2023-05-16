@@ -6,4 +6,5 @@ app_name = 'forum'
 
 urlpatterns = [
     path('', views.DisplayThreadsView.as_view(), name='list'),
+    path('create/', views.CreateThreadView.as_view(), name='create'),
 ]
