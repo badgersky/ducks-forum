@@ -11,12 +11,21 @@ class Thread(models.Model):
     comments = models.ForeignKey('Comment', on_delete=models.CASCADE)
     date_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.subject
+
+    class Meta:
+        ordering = ('-date_at',)
+
 
 class Comment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     content = models.TextField()
     likes = models.IntegerField(validators=[MinValueValidator(0)], default=0)
     date_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.name + self.content[:10]
 
 
 class LikeComment(models.Model):

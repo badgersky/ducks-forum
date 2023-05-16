@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Threads
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    {% for thread in threads %}
+        <div class="card bg-burlywood">
+            <h5 class="card-header">{{ thread.subject }}</h5>
+            <div class="card-body">
+                <h5 class="card-title">Created by: {{ thread.creator.username }}</h5>
+                <p class="card-text">Created at: {{ thread.date_at }}</p>
+                <a href="" class="btn btn-brown">See thread</a>
+            </div>
+        </div>
+    {% empty %}
+        <h4>No threads</h4>
+    {% endfor %}
+{% endblock %}
