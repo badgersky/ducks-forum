@@ -8,7 +8,6 @@ class Thread(models.Model):
     content = models.TextField()
     creator = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True)
     likes = models.IntegerField(validators=[MinValueValidator(0)], default=0)
-    comments = models.ForeignKey('Comment', on_delete=models.CASCADE)
     date_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -20,6 +19,7 @@ class Thread(models.Model):
 
 class Comment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    thread = models.ForeignKey('Thread', on_delete=models.CASCADE)
     content = models.TextField()
     likes = models.IntegerField(validators=[MinValueValidator(0)], default=0)
     date_at = models.DateTimeField(auto_now_add=True)
