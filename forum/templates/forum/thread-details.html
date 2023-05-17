@@ -10,20 +10,20 @@
 {% block content %}
     {{ block.super }}
     <div class="border border-black rounded-2">
-        <div class="p-2 d-flex justify-content-between" role="group" aria-label="Basic example">
+        <div class="p-2 d-flex justify-content-sm-start" role="group" aria-label="Basic example">
             <p class="d-inline me-5">Thread started by: <b>{{ thread.creator }}</b></p>
             {% if user.id == thread.creator.id or user.is_superuser %}
-                <a href="" class="btn btn-brown">Delete</a>
+                <a href="" class="btn btn-brown me-5">Delete</a>
             {% endif %}
-            <a href="" class="btn btn-brown">&#128077</a>
+            <a href="" class="btn btn-brown">Like Thread</a>
         </div>
         <h3 class="p-2 border-top border-bottom border-black">{{ thread.subject.title }}</h3>
         <div class="container mb-2 text-lg-start">
             <p>{{ thread.content }}</p>
         </div>
         <div class="container p-1 pt-5 d-flex justify-content-between">
-            <p>Thread started at: {{ thread.date_at }}</p>
-            <p>Likes: {{ thread.likes }}</p>
+            <p class="ms-2">Thread started at: {{ thread.date_at }}</p>
+            <p class="me-5">Likes: {{ thread.likes }}</p>
         </div>
     </div>
     <br>
@@ -35,6 +35,7 @@
         </form>
     {% endif %}
     <br>
+    <h4 class="m-3 p-2 border-top border-bottom border-black">Answers</h4>
     {% for comment in comments %}
         <div class="p-2 border border-black rounded-2 mb-2 mt-2">
             <div class="p-1 d-flex justify-content-sm-start border-bottom border-black">
@@ -44,7 +45,8 @@
                 <p class="d-inline me-2">{{ comment.content }}</p>
             </div>
             <div class="d-flex justify-content-between">
-                <a href="" class="btn btn-brown">&#128077</a>
+                <a href="" class="btn btn-brown">Like Comment</a>
+                <p class="d-inline me-5">Likes: {{ comment.likes }}</p>
             </div>
         </div>
     {% empty %}
