@@ -13,7 +13,7 @@
         <div class="p-2 d-flex justify-content-sm-start" role="group" aria-label="Basic example">
             <p class="d-inline me-5">Thread started by: <b>{{ thread.creator }}</b></p>
             {% if user.id == thread.creator.id or user.is_superuser %}
-                <a href="" class="btn btn-brown me-5">Delete</a>
+                <a href="{% url 'forum:delete-thread' pk=thread.id %}" class="btn btn-brown me-5">Delete</a>
             {% endif %}
             <a href="" class="btn btn-brown">Like Thread</a>
         </div>

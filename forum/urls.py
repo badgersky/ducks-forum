@@ -8,5 +8,6 @@ urlpatterns = [
     path('', views.DisplayThreadsView.as_view(), name='list'),
     path('create/', views.CreateThreadView.as_view(), name='create'),
     path('<int:pk>/', views.ThreadDetailsView.as_view(), name='details'),
-    path('add-comment/<int:pk>/', views.AddCommentView.as_view(), name='add-comment')
+    path('add-comment/<int:pk>/', views.AddCommentView.as_view(), name='add-comment'),
+    path('delete-thread/<int:pk>/', views.DeleteThreadView.as_view(), name='delete-thread'),
 ]

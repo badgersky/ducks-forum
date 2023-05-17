@@ -3,9 +3,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
 from forum import models, forms
+from forum.permissions import CreatorRequiredMixin
 
 
 class DisplayThreadsView(ListView):
@@ -75,3 +76,11 @@ class AddCommentView(View):
                              f'Login if you want to add comment')
 
         return redirect(reverse('users:login'))
+
+
+class DeleteThreadView(LoginRequiredMixin, CreatorRequiredMixin, DeleteView):
+    model = models.Thread
+    template_name = 'forum/delete-thread.html'
+    login_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('forum:list')
+    context_object_name = 'thread'
