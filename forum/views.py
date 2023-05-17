@@ -6,7 +6,7 @@ from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
 from forum import models, forms
-from forum.permissions import CreatorRequiredMixin
+from forum.permissions import CreatorRequiredMixin, UserRequiredMixin
 
 
 class DisplayThreadsView(ListView):
@@ -84,3 +84,16 @@ class DeleteThreadView(LoginRequiredMixin, CreatorRequiredMixin, DeleteView):
     login_url = reverse_lazy('users:login')
     success_url = reverse_lazy('forum:list')
     context_object_name = 'thread'
+
+
+class DeleteCommentView(LoginRequiredMixin, UserRequiredMixin, DeleteView):
+    model = models.Comment
+    template_name = 'forum/delete-comment.html'
+    login_url = reverse_lazy('users:login')
+    context_object_name = 'comment'
+
+    def get_success_url(self):
+        comment_id = self.kwargs.get('pk')
+        comment = models.Comment.objects.get(pk=comment_id)
+        pk = comment.thread.id
+        return reverse('forum:details', kwargs={'pk': pk})
