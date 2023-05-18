@@ -45,7 +45,11 @@
                 <p class="d-inline me-2">{{ comment.content }}</p>
             </div>
             <div class="d-flex justify-content-between">
-                <a href="" class="btn btn-brown">Like Comment</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'forum:like-comment' thr_pk=thread.id com_pk=comment.id %}" class="btn btn-brown">
+                        Like Comment
+                    </a>
+                {% endif %}
                 {% if user.id == comment.user.id or user.is_superuser %}
                     <a href="{% url 'forum:delete-comment' pk=comment.id %}" class="btn btn-brown me-5">Delete</a>
                 {% endif %}

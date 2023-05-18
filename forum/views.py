@@ -97,3 +97,36 @@ class DeleteCommentView(LoginRequiredMixin, CommentCreatorRequiredMixin, DeleteV
         comment = models.Comment.objects.get(pk=comment_id)
         pk = comment.thread.id
         return reverse('forum:details', kwargs={'pk': pk})
+
+
+class LikeCommentView(View):
+
+    def get(self, reqeust, thr_pk, com_pk):
+        if reqeust.user.is_authenticated:
+            try:
+                comment = models.Comment.objects.get(pk=com_pk)
+            except models.Comment.DoesNotExist:
+                messages.add_message(reqeust,
+                                     messages.WARNING,
+                                     f'Comment does not exist')
+
+                if models.Thread.objects.filter(pk=thr_pk).exists():
+                    return redirect(reverse('forum:details', kwargs={'pk': thr_pk}))
+
+                return redirect(reverse('forum:list'))
+
+            if not models.LikeComment.objects.filter(user=reqeust.user, comment=comment).exists():
+                models.LikeComment.objects.create(user=reqeust.user, comment=comment)
+                comment.likes += 1
+                comment.save()
+
+            if models.Thread.objects.filter(pk=thr_pk).exists():
+                return redirect(reverse('forum:details', kwargs={'pk': thr_pk}))
+
+            return redirect(reverse('forum:list'))
+
+        messages.add_message(reqeust,
+                             messages.WARNING,
+                             f'Login in order to like comment')
+
+        return redirect(reverse('users:login'))
