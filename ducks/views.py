@@ -62,10 +62,13 @@ class DuckDetailsView(View):
             return redirect(reverse('home:home'))
 
         owner = False
+        favorite = False
 
         if request.user.is_authenticated:
             if request.user.id == duck.user.id or request.user.is_superuser:
                 owner = True
+            if duck in request.user.fav_ducks.all():
+                favorite = True
 
         rates = models.DuckRate.objects.filter(duck=duck)
         if rates:
@@ -85,6 +88,7 @@ class DuckDetailsView(View):
                                                            'overall': overall_stats,
                                                            'form': rate_form,
                                                            'rate': duck_rate,
+                                                           'favorite': favorite,
                                                            })
 
 

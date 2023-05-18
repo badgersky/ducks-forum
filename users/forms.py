@@ -27,7 +27,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'confirm_password')
+        fields = ('username', 'password', 'confirm_password')
 
     def clean_confirm_password(self):
         """validate password confirmation"""
@@ -49,16 +49,6 @@ class RegistrationForm(forms.ModelForm):
             raise ValidationError(f'Try using different username')
 
         return username
-
-    def clean_email(self):
-        """validate email"""
-
-        email = self.cleaned_data.get('email')
-
-        if email and get_user_model().objects.filter(email=email).exists():
-            raise ValidationError(f'Try using different email')
-
-        return email
 
     def save(self, commit=True):
         """set user`s password, save user to database"""
