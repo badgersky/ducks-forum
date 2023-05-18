@@ -15,7 +15,9 @@
             {% if user.id == thread.creator.id or user.is_superuser %}
                 <a href="{% url 'forum:delete-thread' pk=thread.id %}" class="btn btn-brown me-5">Delete</a>
             {% endif %}
-            <a href="" class="btn btn-brown">Like Thread</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'forum:like-thread' pk=thread.id %}" class="btn btn-brown">Like Thread</a>
+            {% endif %}
         </div>
         <h3 class="p-2 border-top border-bottom border-black">{{ thread.subject.title }}</h3>
         <div class="container mb-2 text-lg-start">

@@ -101,12 +101,12 @@ class DeleteCommentView(LoginRequiredMixin, CommentCreatorRequiredMixin, DeleteV
 
 class LikeCommentView(View):
 
-    def get(self, reqeust, thr_pk, com_pk):
-        if reqeust.user.is_authenticated:
+    def get(self, request, thr_pk, com_pk):
+        if request.user.is_authenticated:
             try:
                 comment = models.Comment.objects.get(pk=com_pk)
             except models.Comment.DoesNotExist:
-                messages.add_message(reqeust,
+                messages.add_message(request,
                                      messages.WARNING,
                                      f'Comment does not exist')
 
@@ -115,8 +115,8 @@ class LikeCommentView(View):
 
                 return redirect(reverse('forum:list'))
 
-            if not models.LikeComment.objects.filter(user=reqeust.user, comment=comment).exists():
-                models.LikeComment.objects.create(user=reqeust.user, comment=comment)
+            if not models.LikeComment.objects.filter(user=request.user, comment=comment).exists():
+                models.LikeComment.objects.create(user=request.user, comment=comment)
                 comment.likes += 1
                 comment.save()
 
@@ -125,8 +125,35 @@ class LikeCommentView(View):
 
             return redirect(reverse('forum:list'))
 
-        messages.add_message(reqeust,
+        messages.add_message(request,
                              messages.WARNING,
                              f'Login in order to like comment')
+
+        return redirect(reverse('users:login'))
+
+
+class LikeThreadView(View):
+
+    def get(self, request, pk):
+        if request.user.is_authenticated:
+            try:
+                thread = models.Thread.objects.get(pk=pk)
+            except models.Thread.DoesNotExist:
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'Thread does not exist')
+
+                return redirect(reverse('forum:list'))
+
+            if not models.LikeThread.objects.filter(user=request.user, thread=thread).exists():
+                models.LikeThread.objects.create(user=request.user, thread=thread)
+                thread.likes += 1
+                thread.save()
+
+            return redirect(reverse('forum:details', kwargs={'pk': pk}))
+
+        messages.add_message(request,
+                             messages.WARNING,
+                             f'Login in order to like thread')
 
         return redirect(reverse('users:login'))
