@@ -18,7 +18,7 @@
             {% if not favorite %}
                 <a href="{% url 'users:add-fav-duck' pk=duck.id %}" class="btn btn-brown">Add to Favorites</a>
             {% else %}
-                <a href="" class="btn btn-brown">Delete from Favorites</a>
+                <a href="{% url 'users:del-fav-duck' pk=duck.id %}" class="btn btn-brown">Delete from Favorites</a>
             {% endif %}
         {% endif %}
     </div>
