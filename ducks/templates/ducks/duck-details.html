@@ -15,7 +15,11 @@
             <a href="{% url 'ducks:edit' pk=duck.id %}" class="btn btn-brown">Edit</a>
         {% endif %}
         {% if user.is_authenticated %}
-            <a href="{% url 'users:add-fav-duck' pk=duck.id %}" class="btn btn-brown">Add to Favorites</a>
+            {% if not favorite %}
+                <a href="{% url 'users:add-fav-duck' pk=duck.id %}" class="btn btn-brown">Add to Favorites</a>
+            {% else %}
+                <a href="" class="btn btn-brown">Delete from Favorites</a>
+            {% endif %}
         {% endif %}
     </div>
     <h3 class="p-2 border-bottom border-black">{{ duck.name.title }}</h3>

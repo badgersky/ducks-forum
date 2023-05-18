@@ -65,6 +65,7 @@ class LogoutView(View):
 
 
 class AddFavDuck(View):
+    """View that add duck to user`s favorite ducks"""
 
     def get(self, request, pk):
         if request.user.is_authenticated:
@@ -84,7 +85,6 @@ class AddFavDuck(View):
                                      messages.SUCCESS,
                                      f'Duck added to favorites')
             else:
-
                 messages.add_message(request,
                                      messages.WARNING,
                                      f'Duck already in favorite ducks')
