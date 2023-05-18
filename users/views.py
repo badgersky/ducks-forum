@@ -77,7 +77,17 @@ class AddFavDuck(View):
 
                 return redirect(reverse('ducks:list'))
 
-            request.user.fav_ducks.add(duck)
+            if duck not in request.user.fav_ducks.all():
+                request.user.fav_ducks.add(duck)
+
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     f'Duck added to favorites')
+            else:
+
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'Duck already in favorite ducks')
 
             return redirect(reverse('ducks:details', kwargs={'pk': pk}))
 
@@ -86,4 +96,3 @@ class AddFavDuck(View):
                              f'Login if you want to add this duck to favorites')
 
         return redirect(reverse('users:login'))
-    
