@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import AccessMixin
 
 
-class CreatorRequiredMixin(AccessMixin):
+class ThreadCreatorRequiredMixin(AccessMixin):
     """Verify that the current user is thread creator or admin."""
 
     def dispatch(self, request, *args, **kwargs):
@@ -11,7 +11,7 @@ class CreatorRequiredMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class UserRequiredMixin(AccessMixin):
+class CommentCreatorRequiredMixin(AccessMixin):
     """Verify that the current user is comment creator or admin."""
 
     def dispatch(self, request, *args, **kwargs):
