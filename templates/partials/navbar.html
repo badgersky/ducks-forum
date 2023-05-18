@@ -17,9 +17,17 @@
                 <li class="nav-item">
                     <a class="nav-link active m-2" aria-current="page" href="{% url 'ducks:list' %}">All Ducks</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link active m-2" aria-current="page" href="{% url 'forum:list' %}">All Threads</a>
+                </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link active m-2" aria-current="page" href="{% url 'ducks:add' %}">Add Duck</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active m-2" aria-current="page" href="{% url 'forum:create' %}">
+                            Start Thread
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active m-2" aria-current="page" href="{% url 'users:logout' %}">Logout</a>

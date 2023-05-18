@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'home.apps.HomeConfig',
     'ducks.apps.DucksConfig',
+    'forum.apps.ForumConfig',
 ]
 
 MIDDLEWARE = [
