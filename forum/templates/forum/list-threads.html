@@ -10,7 +10,7 @@
 {% block content %}
     {{ block.super }}
     {% for thread in threads %}
-        <div class="card align-content-lg-start bg-burlywood">
+        <div class="card align-content-lg-start bg-burlywood m-2">
             <h5 class="card-header">{{ thread.subject }}</h5>
             <div class="card-body">
                 <h5 class="card-title">Created by: {{ thread.creator.username }}</h5>
