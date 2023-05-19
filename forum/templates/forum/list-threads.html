@@ -9,6 +9,9 @@
 
 {% block content %}
     {{ block.super }}
+    <div class="row">
+        <h2 class="border-bottom border-top border-black p-2">All Threads</h2>
+    </div>
     {% for thread in threads %}
         <div class="card align-content-lg-start bg-burlywood m-2">
             <h5 class="card-header">{{ thread.subject }}</h5>
