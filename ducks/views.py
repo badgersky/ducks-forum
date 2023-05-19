@@ -27,6 +27,10 @@ class AddDuckView(View):
             duck = form.save(commit=False)
 
             duck.user = request.user
+
+            request.user.score += 5
+            request.user.save()
+
             duck.save()
 
             messages.add_message(request,
