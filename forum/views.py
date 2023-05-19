@@ -24,6 +24,8 @@ class CreateThreadView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.creator = self.request.user
+        self.request.user.score += 5
+        self.request.user.save()
         return super().form_valid(form)
 
 
@@ -66,6 +68,9 @@ class AddCommentView(View):
                                          f'No such thread')
 
                     return redirect(reverse('forum:list'))
+
+                request.user.score += 2
+                request.user.save()
 
                 form.save()
 
@@ -118,6 +123,8 @@ class LikeCommentView(View):
             if not models.LikeComment.objects.filter(user=request.user, comment=comment).exists():
                 models.LikeComment.objects.create(user=request.user, comment=comment)
                 comment.likes += 1
+                comment.user.score += 1
+                comment.user.save()
                 comment.save()
 
             if models.Thread.objects.filter(pk=thr_pk).exists():
@@ -148,6 +155,8 @@ class LikeThreadView(View):
             if not models.LikeThread.objects.filter(user=request.user, thread=thread).exists():
                 models.LikeThread.objects.create(user=request.user, thread=thread)
                 thread.likes += 1
+                thread.creator.score += 1
+                thread.creator.save()
                 thread.save()
 
             return redirect(reverse('forum:details', kwargs={'pk': pk}))
