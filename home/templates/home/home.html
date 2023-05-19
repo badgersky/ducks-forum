@@ -10,6 +10,19 @@
 {% block content %}
     {{ block.super }}
     <div class="row">
-        <h2>Home Page</h2>
+        <h2 class="border-bottom border-top border-black p-2">Most popular threads</h2>
     </div>
+    <br>
+    {% for thread in threads %}
+        <div class="card align-content-lg-start bg-burlywood m-2">
+            <h5 class="card-header">{{ thread.subject }}</h5>
+            <div class="card-body">
+                <h5 class="card-title">Created by: {{ thread.creator.username }}</h5>
+                <p class="card-text">Created at: {{ thread.date_at }}</p>
+                <a href="{% url 'forum:details' pk=thread.id %}" class="btn btn-brown">See thread</a>
+            </div>
+        </div>
+    {% empty %}
+        <h4>No threads</h4>
+    {% endfor %}
 {% endblock %}
