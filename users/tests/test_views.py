@@ -51,4 +51,4 @@ def test_login_post(user, db, client):
 
     assert redirect.status_code == 302
     assert response.status_code == 200
-    assert '<span class="navbar-text m-2">Logged in username1</span>' in response.content.decode('utf-8')
+    assert f'<span class="navbar-text m-2">Logged in {data["username"]}</span>' in response.content.decode('utf-8')
