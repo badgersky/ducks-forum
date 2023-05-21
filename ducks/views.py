@@ -75,7 +75,7 @@ class DuckDetailsView(View):
         favorite = False
 
         if request.user.is_authenticated:
-            if request.user.id == duck.user.id or request.user.is_superuser:
+            if request.user.pk == duck.user.pk or request.user.is_superuser:
                 owner = True
             if duck in request.user.fav_ducks.all():
                 favorite = True
