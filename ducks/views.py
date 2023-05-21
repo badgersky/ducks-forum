@@ -4,7 +4,7 @@ from django.db.models import F, Sum
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
 from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
 from ducks.models import Duck, DuckRate
@@ -128,52 +128,30 @@ class EditDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, UpdateView):
         return super().get_login_url()
 
 
-class DeleteDuckView(View):
+class DeleteDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, DeleteView):
     """View for deleting duck"""
 
-    def get(self, request, pk):
-        if request.user.is_authenticated:
-            try:
-                duck = models.Duck.objects.get(pk=pk)
-            except models.Duck.DoesNotExist:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'Sorry, we lost this duck')
+    model = Duck
+    template_name = 'ducks/delete-duck.html'
+    context_object_name = 'duck'
+    login_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('ducks:list')
 
-                return redirect(reverse('home:home'))
+    def get_login_url(self):
+        messages.add_message(
+            self.request,
+            messages.WARNING,
+            f'If you want to delete this duck, you must login'
+        )
+        return super().get_login_url()
 
-            if request.user.id == duck.user.id or request.user.is_superuser:
-                return render(request, 'ducks/delete-duck.html', {'duck': duck})
-            else:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'You cannot delete this duck')
-
-                return redirect(reverse('ducks:details', kwargs={'pk': duck.id}))
-
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'If you want to delete this duck, you must login')
-
-        return redirect(reverse('users:login'))
-
-    def post(self, request, pk):
-        try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
-            messages.add_message(request,
-                                 messages.WARNING,
-                                 f'Sorry, we lost this duck')
-
-            return redirect(reverse('home:home'))
-
-        duck.delete()
-
-        messages.add_message(request,
-                             messages.SUCCESS,
-                             f'Successfully deleted duck')
-
-        return redirect(reverse('ducks:list'))
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Successfully deleted duck'
+        )
+        return super().get_success_url()
 
 
 class RateDuckView(View):
