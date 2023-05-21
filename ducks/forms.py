@@ -16,15 +16,17 @@ class AddDuckForm(forms.ModelForm):
 
     class Meta:
         model = models.Duck
-        fields = ('name',
-                  'description',
-                  'origin_country',
-                  'image',
-                  'avg_weight',
-                  'strength',
-                  'agility',
-                  'intelligence',
-                  'charisma')
+        fields = (
+            'name',
+            'description',
+            'origin_country',
+            'image',
+            'avg_weight',
+            'strength',
+            'agility',
+            'intelligence',
+            'charisma'
+        )
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
@@ -48,7 +50,7 @@ class AddDuckForm(forms.ModelForm):
         duck.name = self.cleaned_data.get('name').lower()
 
         if commit:
-            self.save()
+            super().save()
 
         return duck
 
@@ -57,14 +59,16 @@ class EditDuckForm(AddDuckForm):
     """class for editing duck"""
 
     class Meta(AddDuckForm.Meta):
-        fields = ('name',
-                  'description',
-                  'origin_country',
-                  'avg_weight',
-                  'strength',
-                  'agility',
-                  'intelligence',
-                  'charisma')
+        fields = (
+            'name',
+            'description',
+            'origin_country',
+            'avg_weight',
+            'strength',
+            'agility',
+            'intelligence',
+            'charisma'
+        )
 
 
 class RateDuckForm(forms.ModelForm):
@@ -75,7 +79,7 @@ class RateDuckForm(forms.ModelForm):
     rate = forms.ChoiceField(
         label='Rate Duck',
         choices=choices
-        )
+    )
 
     class Meta:
         model = models.DuckRate

@@ -1,55 +1,61 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F, Sum
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
-from ducks import forms, models
+from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
+from ducks.models import Duck, DuckRate
+from ducks.permissions import DuckCreatorRequiredMixin
 
 
-class AddDuckView(View):
+class AddDuckView(LoginRequiredMixin, CreateView):
     """View for adding duck to database"""
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            form = forms.AddDuckForm()
-            return render(request, 'ducks/add-duck.html', {'form': form})
+    form_class = AddDuckForm
+    template_name = 'ducks/add-duck.html'
+    context_object_name = 'form'
+    success_url = reverse_lazy('ducks:list')
+    login_url = reverse_lazy('users:login')
 
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'Login in order to add duck'
-                             )
-        return redirect(reverse('users:login'))
+    def form_valid(self, form):
+        self.request.user.score = F('score') + 2
+        self.request.user.save()
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
-    def post(self, request):
-        form = forms.AddDuckForm(request.POST, request.FILES)
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Successfully added duck')
+        return super().get_success_url()
 
-        if form.is_valid():
-            duck = form.save(commit=False)
-
-            duck.user = request.user
-
-            request.user.score += 5
-            request.user.save()
-
-            duck.save()
-
-            messages.add_message(request,
-                                 messages.SUCCESS,
-                                 f'Successfully added duck')
-
-            return redirect(reverse('ducks:list'))
-
-        return render(request, 'ducks/add-duck.html', {'form': form})
+    def handle_no_permission(self):
+        messages.add_message(
+            self.request,
+            messages.WARNING,
+            f'Login in order to add duck'
+        )
+        return super().handle_no_permission()
 
 
-class ListDucksView(View):
+class ListDucksView(ListView):
     """lists all ducks with their photos and link to duck-details page"""
 
-    def get(self, request):
-        ducks = models.Duck.objects.all()
-        duck_table = [ducks[i:i + 3] for i in range(0, len(ducks), 3)]
+    model = Duck
+    template_name = 'ducks/list-ducks.html'
 
-        return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+
+        ducks = Duck.objects.all()
+        num_of_ducks = ducks.count()
+        context['duck_table'] = [ducks[i:i + 3] for i in range(0, num_of_ducks, 3)]
+
+        return context
 
 
 class DuckDetailsView(View):
@@ -57,8 +63,8 @@ class DuckDetailsView(View):
 
     def get(self, request, pk):
         try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
+            duck = Duck.objects.get(pk=pk)
+        except Duck.DoesNotExist:
             messages.add_message(request,
                                  messages.WARNING,
                                  f'Sorry, we lost this duck')
@@ -69,15 +75,15 @@ class DuckDetailsView(View):
         favorite = False
 
         if request.user.is_authenticated:
-            if request.user.id == duck.user.id or request.user.is_superuser:
+            if request.user.pk == duck.user.pk or request.user.is_superuser:
                 owner = True
             if duck in request.user.fav_ducks.all():
                 favorite = True
 
-        rates = models.DuckRate.objects.filter(duck=duck)
+        rates = DuckRate.objects.filter(duck=duck)
         if rates:
-            rates_values = [rate.rate for rate in rates]
-            duck_rate = sum(rates_values) / len(rates_values)
+            rates_sum = rates.aggregate(Sum('rate'))
+            duck_rate = float(rates_sum['rate__sum']) / rates.count()
             duck_rate = round(duck_rate, 1)
         else:
             duck_rate = 0
@@ -85,7 +91,7 @@ class DuckDetailsView(View):
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
-        rate_form = forms.RateDuckForm()
+        rate_form = RateDuckForm()
 
         return render(request, 'ducks/duck-details.html', {'duck': duck,
                                                            'owner': owner,
@@ -96,162 +102,95 @@ class DuckDetailsView(View):
                                                            })
 
 
-class EditDuckView(View):
+class EditDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, UpdateView):
     """View for editing duck"""
 
-    def get(self, request, pk):
-        if request.user.is_authenticated:
-            try:
-                duck = models.Duck.objects.get(pk=pk)
-            except models.Duck.DoesNotExist:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'Sorry, we lost this duck')
+    model = Duck
+    form_class = EditDuckForm
+    template_name = 'ducks/edit-duck.html'
+    context_object_name = 'form'
+    login_url = reverse_lazy('users:login')
 
-                return redirect(reverse('home:home'))
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Successfully edited duck'
+        )
+        return reverse('ducks:details', kwargs={'pk': self.kwargs.get('pk')})
 
-            if request.user.id == duck.user.id or request.user.is_superuser:
-                form = forms.EditDuckForm(initial={'name': duck.name,
-                                                   'description': duck.description,
-                                                   'origin_country': duck.origin_country,
-                                                   'avg_weight': duck.avg_weight,
-                                                   'strength': duck.strength,
-                                                   'agility': duck.agility,
-                                                   'intelligence': duck.intelligence,
-                                                   'charisma': duck.charisma})
-
-                return render(request, 'ducks/edit-duck.html', {'form': form})
-            else:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'You cannot edit this duck')
-
-                return redirect(reverse('ducks:details', kwargs={'pk': duck.id}))
-
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'If you want to edit this duck, you must login')
-
-        return redirect(reverse('users:login'))
-
-    def post(self, request, pk):
-        form = forms.EditDuckForm(request.POST)
-
-        if form.is_valid():
-            try:
-                duck = models.Duck.objects.get(pk=pk)
-            except models.Duck.DoesNotExist:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'Sorry, we lost this duck')
-
-                return redirect(reverse('home:home'))
-
-            duck.name = form.cleaned_data.get('name')
-            duck.description = form.cleaned_data.get('description')
-            duck.origin_country = form.cleaned_data.get('origin_country')
-            duck.avg_weight = form.cleaned_data.get('avg_weight')
-            duck.strength = form.cleaned_data.get('strength')
-            duck.agility = form.cleaned_data.get('agility')
-            duck.intelligence = form.cleaned_data.get('intelligence')
-            duck.charisma = form.cleaned_data.get('charisma')
-            duck.save()
-
-            messages.add_message(request,
-                                 messages.SUCCESS,
-                                 f'Successfully edited duck')
-
-            return redirect(reverse('ducks:list'))
-
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'No edits have been made')
-
-        return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+    def get_login_url(self):
+        messages.add_message(
+            self.request,
+            messages.WARNING,
+            f'You must login in order to edit this duck'
+        )
+        return super().get_login_url()
 
 
-class DeleteDuckView(View):
+class DeleteDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, DeleteView):
     """View for deleting duck"""
 
-    def get(self, request, pk):
-        if request.user.is_authenticated:
-            try:
-                duck = models.Duck.objects.get(pk=pk)
-            except models.Duck.DoesNotExist:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'Sorry, we lost this duck')
+    model = Duck
+    template_name = 'ducks/delete-duck.html'
+    context_object_name = 'duck'
+    login_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('ducks:list')
 
-                return redirect(reverse('home:home'))
+    def get_login_url(self):
+        messages.add_message(
+            self.request,
+            messages.WARNING,
+            f'If you want to delete this duck, you must login'
+        )
+        return super().get_login_url()
 
-            if request.user.id == duck.user.id or request.user.is_superuser:
-                return render(request, 'ducks/delete-duck.html', {'duck': duck})
-            else:
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     f'You cannot delete this duck')
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Successfully deleted duck'
+        )
+        return super().get_success_url()
 
-                return redirect(reverse('ducks:details', kwargs={'pk': duck.id}))
 
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'If you want to delete this duck, you must login')
-
-        return redirect(reverse('users:login'))
+class RateDuckView(LoginRequiredMixin, View):
+    """View rates duck in scale 1-10"""
+    login_url = reverse_lazy('users:login')
 
     def post(self, request, pk):
         try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
+            duck = Duck.objects.get(pk=pk)
+        except Duck.DoesNotExist:
             messages.add_message(request,
                                  messages.WARNING,
                                  f'Sorry, we lost this duck')
 
             return redirect(reverse('home:home'))
 
-        duck.delete()
+        form = RateDuckForm(request.POST)
 
-        messages.add_message(request,
-                             messages.SUCCESS,
-                             f'Successfully deleted duck')
-
-        return redirect(reverse('ducks:list'))
-
-
-class RateDuckView(View):
-
-    def post(self, request, pk):
-        try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
-            messages.add_message(request,
-                                 messages.WARNING,
-                                 f'Sorry, we lost this duck')
-
-            return redirect(reverse('home:home'))
-
-        if request.user.is_authenticated:
-            form = forms.RateDuckForm(request.POST)
-
-            if form.is_valid():
-                if models.DuckRate.objects.filter(user=request.user, duck=duck).exists():
-                    messages.add_message(request,
-                                         messages.WARNING,
-                                         f'You have already rated {duck.name.title()}')
-
-                    return redirect(reverse('ducks:details', kwargs={'pk': pk}))
-
-                rate = form.save(commit=False)
-
-                rate.user = request.user
-                rate.duck = duck
-
-                form.save()
+        if form.is_valid():
+            if DuckRate.objects.filter(user=request.user, duck=duck).exists():
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'You have already rated {duck.name.title()}')
 
                 return redirect(reverse('ducks:details', kwargs={'pk': pk}))
 
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'Login before rating {duck.name.title()}')
+            rate = form.save(commit=False)
 
-        return redirect(reverse('users:login'))
+            rate.user = request.user
+            rate.duck = duck
+
+            form.save()
+
+            return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+
+    def get_login_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Login in order to rate this duck'
+        )
+        return super().get_login_url()

@@ -12,11 +12,11 @@
     <div class="border border-black rounded-2">
         <div class="p-2 d-flex justify-content-sm-start" role="group" aria-label="Basic example">
             <p class="d-inline me-5">Thread started by: <b>{{ thread.creator }}</b></p>
-            {% if user.id == thread.creator.id or user.is_superuser %}
-                <a href="{% url 'forum:delete-thread' pk=thread.id %}" class="btn btn-brown me-5">Delete</a>
+            {% if user.pk == thread.creator.pk or user.is_superuser %}
+                <a href="{% url 'forum:delete-thread' pk=thread.pk %}" class="btn btn-brown me-5">Delete</a>
             {% endif %}
             {% if user.is_authenticated %}
-                <a href="{% url 'forum:like-thread' pk=thread.id %}" class="btn btn-brown">Like Thread</a>
+                <a href="{% url 'forum:like-thread' pk=thread.pk %}" class="btn btn-brown">Like Thread</a>
             {% endif %}
         </div>
         <h3 class="p-2 border-top border-bottom border-black">{{ thread.subject.title }}</h3>
@@ -30,7 +30,7 @@
     </div>
     <br>
     {% if user.is_authenticated %}
-        <form action="{% url 'forum:add-comment' pk=thread.id %}" method="post" class="d-inline">
+        <form action="{% url 'forum:add-comment' pk=thread.pk %}" method="post" class="d-inline">
             {% csrf_token %}
             {{ form|crispy }}
             <button class="btn btn-brown" type="submit">Add Comment</button>
@@ -48,12 +48,12 @@
             </div>
             <div class="d-flex justify-content-between">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'forum:like-comment' thr_pk=thread.id com_pk=comment.id %}" class="btn btn-brown">
+                    <a href="{% url 'forum:like-comment' thr_pk=thread.pk com_pk=comment.pk %}" class="btn btn-brown">
                         Like Comment
                     </a>
                 {% endif %}
-                {% if user.id == comment.user.id or user.is_superuser %}
-                    <a href="{% url 'forum:delete-comment' pk=comment.id %}" class="btn btn-brown me-5">Delete</a>
+                {% if user.pk == comment.user.pk or user.is_superuser %}
+                    <a href="{% url 'forum:delete-comment' pk=comment.pk %}" class="btn btn-brown me-5">Delete</a>
                 {% endif %}
                 <p class="d-inline me-5">Likes: {{ comment.likes }}</p>
             </div>
