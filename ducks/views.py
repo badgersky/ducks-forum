@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F
+from django.db.models import F, Sum
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DetailView
 
 from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
 from ducks.models import Duck, DuckRate
@@ -80,8 +80,8 @@ class DuckDetailsView(View):
 
         rates = DuckRate.objects.filter(duck=duck)
         if rates:
-            rates_values = [rate.rate for rate in rates]
-            duck_rate = sum(rates_values) / len(rates_values)
+            rates_sum = rates.aggregate(Sum('rate'))
+            duck_rate = float(rates_sum['rate__sum']) / rates.count()
             duck_rate = round(duck_rate, 1)
         else:
             duck_rate = 0
