@@ -25,7 +25,7 @@ class Comment(models.Model):
     date_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.name + self.content[:10]
+        return self.content[:10]
 
 
 class LikeComment(models.Model):
