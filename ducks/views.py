@@ -4,7 +4,7 @@ from django.db.models import F
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
 from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
 from ducks.models import Duck, DuckRate
@@ -20,7 +20,9 @@ class AddDuckView(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        self.request.user.score = F('score') + 1
+        self.request.user.score = F('score') + 2
+        self.request.user.save()
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -38,14 +40,20 @@ class AddDuckView(LoginRequiredMixin, CreateView):
         return super().handle_no_permission()
 
 
-class ListDucksView(View):
+class ListDucksView(ListView):
     """lists all ducks with their photos and link to duck-details page"""
 
-    def get(self, request):
-        ducks = Duck.objects.all()
-        duck_table = [ducks[i:i + 3] for i in range(0, len(ducks), 3)]
+    model = Duck
+    template_name = 'ducks/list-ducks.html'
 
-        return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+
+        ducks = Duck.objects.all()
+        num_of_ducks = ducks.count()
+        context['duck_table'] = [ducks[i:i+3] for i in range(0, num_of_ducks, 3)]
+
+        return context
 
 
 class DuckDetailsView(View):
