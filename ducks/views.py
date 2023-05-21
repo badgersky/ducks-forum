@@ -4,7 +4,7 @@ from django.db.models import F, Sum
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 
 from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
 from ducks.models import Duck, DuckRate
@@ -154,40 +154,43 @@ class DeleteDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, DeleteView):
         return super().get_success_url()
 
 
-class RateDuckView(View):
+class RateDuckView(LoginRequiredMixin, View):
+    """View rates duck in scale 1-10"""
+    login_url = reverse_lazy('users:login')
 
     def post(self, request, pk):
         try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
+            duck = Duck.objects.get(pk=pk)
+        except Duck.DoesNotExist:
             messages.add_message(request,
                                  messages.WARNING,
                                  f'Sorry, we lost this duck')
 
             return redirect(reverse('home:home'))
 
-        if request.user.is_authenticated:
-            form = forms.RateDuckForm(request.POST)
+        form = RateDuckForm(request.POST)
 
-            if form.is_valid():
-                if models.DuckRate.objects.filter(user=request.user, duck=duck).exists():
-                    messages.add_message(request,
-                                         messages.WARNING,
-                                         f'You have already rated {duck.name.title()}')
-
-                    return redirect(reverse('ducks:details', kwargs={'pk': pk}))
-
-                rate = form.save(commit=False)
-
-                rate.user = request.user
-                rate.duck = duck
-
-                form.save()
+        if form.is_valid():
+            if DuckRate.objects.filter(user=request.user, duck=duck).exists():
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     f'You have already rated {duck.name.title()}')
 
                 return redirect(reverse('ducks:details', kwargs={'pk': pk}))
 
-        messages.add_message(request,
-                             messages.WARNING,
-                             f'Login before rating {duck.name.title()}')
+            rate = form.save(commit=False)
 
-        return redirect(reverse('users:login'))
+            rate.user = request.user
+            rate.duck = duck
+
+            form.save()
+
+            return redirect(reverse('ducks:details', kwargs={'pk': pk}))
+
+    def get_login_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Login in order to rate this duck'
+        )
+        return super().get_login_url()
