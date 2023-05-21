@@ -3,6 +3,16 @@ from django.urls import reverse
 from forum.models import Thread
 
 
+def test_create_thread_get(client, db, user):
+    url = reverse('forum:create')
+    client.force_login(user)
+
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert '<h2 class="border-bottom border-top border-black p-2">Start Thread</h2>' in response.content.decode('utf-8')
+
+
 def test_create_thread_post(client, db, user):
     url = reverse('forum:create')
     data = {
