@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import CreateView, ListView, DeleteView, FormView, DetailView
+from django.views.generic import CreateView, ListView, DeleteView, DetailView
 
 from forum.models import Thread, Comment, LikeComment, LikeThread
 from forum.forms import AddCommentForm
