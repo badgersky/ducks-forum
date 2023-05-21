@@ -48,7 +48,7 @@ class AddDuckForm(forms.ModelForm):
         duck.name = self.cleaned_data.get('name').lower()
 
         if commit:
-            self.save()
+            super().save()
 
         return duck
 

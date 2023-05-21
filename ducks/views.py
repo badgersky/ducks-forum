@@ -1,52 +1,48 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
+from django.views.generic import CreateView
 
-from ducks import forms, models
+from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
+from ducks.models import Duck, DuckRate
 
 
-class AddDuckView(View):
+class AddDuckView(LoginRequiredMixin, CreateView):
     """View for adding duck to database"""
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            form = forms.AddDuckForm()
-            return render(request, 'ducks/add-duck.html', {'form': form})
+    form_class = AddDuckForm
+    template_name = 'ducks/add-duck.html'
+    context_object_name = 'form'
+    success_url = reverse_lazy('ducks:list')
+    login_url = reverse_lazy('users:login')
 
-        messages.add_message(request,
+    def form_valid(self, form):
+        self.request.user.score = F('score') + 1
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            f'Successfully added duck')
+        return super().get_success_url()
+
+    def handle_no_permission(self):
+        messages.add_message(self.request,
                              messages.WARNING,
                              f'Login in order to add duck'
                              )
-        return redirect(reverse('users:login'))
-
-    def post(self, request):
-        form = forms.AddDuckForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            duck = form.save(commit=False)
-
-            duck.user = request.user
-
-            request.user.score += 5
-            request.user.save()
-
-            duck.save()
-
-            messages.add_message(request,
-                                 messages.SUCCESS,
-                                 f'Successfully added duck')
-
-            return redirect(reverse('ducks:list'))
-
-        return render(request, 'ducks/add-duck.html', {'form': form})
+        return super().handle_no_permission()
 
 
 class ListDucksView(View):
     """lists all ducks with their photos and link to duck-details page"""
 
     def get(self, request):
-        ducks = models.Duck.objects.all()
+        ducks = Duck.objects.all()
         duck_table = [ducks[i:i + 3] for i in range(0, len(ducks), 3)]
 
         return render(request, 'ducks/list-ducks.html', {'duck_table': duck_table})
@@ -57,8 +53,8 @@ class DuckDetailsView(View):
 
     def get(self, request, pk):
         try:
-            duck = models.Duck.objects.get(pk=pk)
-        except models.Duck.DoesNotExist:
+            duck = Duck.objects.get(pk=pk)
+        except Duck.DoesNotExist:
             messages.add_message(request,
                                  messages.WARNING,
                                  f'Sorry, we lost this duck')
@@ -74,7 +70,7 @@ class DuckDetailsView(View):
             if duck in request.user.fav_ducks.all():
                 favorite = True
 
-        rates = models.DuckRate.objects.filter(duck=duck)
+        rates = DuckRate.objects.filter(duck=duck)
         if rates:
             rates_values = [rate.rate for rate in rates]
             duck_rate = sum(rates_values) / len(rates_values)
@@ -85,7 +81,7 @@ class DuckDetailsView(View):
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
 
-        rate_form = forms.RateDuckForm()
+        rate_form = RateDuckForm()
 
         return render(request, 'ducks/duck-details.html', {'duck': duck,
                                                            'owner': owner,
