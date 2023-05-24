@@ -1,6 +1,6 @@
 import pytest
 
-from forum.models import Thread
+from forum.models import Thread, Comment
 
 
 @pytest.fixture
@@ -28,3 +28,18 @@ def thread(db, client, user):
     )
 
     return thread
+
+
+@pytest.fixture
+def comment(db, client, user, thread):
+    """comment instance"""
+
+    client.force_login(user)
+
+    comment = Comment.objects.create(
+        thread=thread,
+        user=user,
+        content='comment content',
+    )
+
+    return comment

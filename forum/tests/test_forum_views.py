@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from forum.models import Thread, Comment, LikeThread
+from forum.models import Thread, Comment, LikeThread, LikeComment
 
 
 def test_create_thread_get(client, db, user):
@@ -61,6 +61,20 @@ def test_like_thread(client, db, user, thread):
 
     redirect = client.get(url)
     likes_after = LikeThread.objects.filter(thread=thread).count()
+    response = client.get(redirect.url)
+
+    assert likes_before == likes_after - 1
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+
+
+def test_like_comment(client, db, user, thread, comment):
+    url = reverse('forum:like-comment', kwargs={'thr_pk': thread.pk, 'com_pk': comment.pk})
+    client.force_login(user)
+    likes_before = LikeComment.objects.filter(comment=comment, user=user).count()
+
+    redirect = client.get(url)
+    likes_after = LikeComment.objects.filter(comment=comment, user=user).count()
     response = client.get(redirect.url)
 
     assert likes_before == likes_after - 1
