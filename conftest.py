@@ -1,4 +1,8 @@
+from io import BytesIO
+
 import pytest
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from forum.models import Thread, Comment
 
@@ -43,3 +47,13 @@ def comment(db, client, user, thread):
     )
 
     return comment
+
+
+@pytest.fixture
+def image():
+    """temporary image object"""
+
+    bts = BytesIO()
+    img = Image.new("RGB", (100, 100))
+    img.save(bts, 'jpeg')
+    return SimpleUploadedFile("test.jpg", bts.getvalue())
