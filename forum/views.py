@@ -40,9 +40,7 @@ class ThreadDetailsView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        print(kwargs.get('object').pk)
         context['comments'] = Comment.objects.filter(thread_id=kwargs.get('object').pk)
-        print(context['comments'])
         context['form'] = AddCommentForm
         return context
 
