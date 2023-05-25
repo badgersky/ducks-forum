@@ -120,3 +120,17 @@ def test_add_comment_no_permission(client, db, thread):
     assert response.status_code == 200
     assert comments_num == comments_num_after
     assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_start_thread_no_permission(client, db):
+    url = reverse('forum:create')
+    threads_num = Thread.objects.count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    threads_num_after = Thread.objects.count()
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert threads_num == threads_num_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+    
