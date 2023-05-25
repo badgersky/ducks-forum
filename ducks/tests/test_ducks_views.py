@@ -70,4 +70,14 @@ def test_rate_duck(client, db, duck, user):
 def test_add_duck_no_permission(client, db):
     redirect, response = _test_not_logged_user(client, reverse('ducks:add'))
 
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_rate_duck_no_permission(client, db, duck):
+    redirect, response = _test_not_logged_user(client, reverse('ducks:rate', kwargs={'pk': duck.pk}))
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
     assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
