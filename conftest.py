@@ -24,8 +24,6 @@ def user(db, django_user_model):
 def thread(db, client, user):
     """Thread instance"""
 
-    client.force_login(user)
-
     thread = Thread.objects.create(
         subject='subject1',
         content='content1',
@@ -38,8 +36,6 @@ def thread(db, client, user):
 @pytest.fixture
 def comment(db, client, user, thread):
     """comment instance"""
-
-    client.force_login(user)
 
     comment = Comment.objects.create(
         thread=thread,

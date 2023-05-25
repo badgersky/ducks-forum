@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from conftest import _test_not_logged_user
 from forum.models import Thread, Comment, LikeThread, LikeComment
 
 
@@ -80,3 +81,56 @@ def test_like_comment(client, db, user, thread, comment):
     assert likes_before == likes_after - 1
     assert redirect.status_code == 302
     assert response.status_code == 200
+
+
+def test_like_comment_no_permission(client, db, thread, comment):
+    url = reverse('forum:like-comment', kwargs={'thr_pk': thread.pk, 'com_pk': comment.pk})
+    likes_before = LikeComment.objects.filter(comment=comment).count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    likes_after = LikeComment.objects.filter(comment=comment).count()
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert likes_before == likes_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_like_thread_no_permission(client, db, thread):
+    url = reverse('forum:like-thread', kwargs={'pk': thread.pk})
+    likes_before = LikeThread.objects.filter(thread=thread).count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    likes_after = LikeThread.objects.filter(thread=thread).count()
+
+    assert response.status_code == 200
+    assert redirect.status_code == 302
+    assert likes_before == likes_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_add_comment_no_permission(client, db, thread):
+    url = reverse('forum:add-comment', kwargs={'pk': thread.pk})
+    comments_num = Comment.objects.filter(thread=thread).count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    comments_num_after = Comment.objects.filter(thread=thread).count()
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert comments_num == comments_num_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_start_thread_no_permission(client, db):
+    url = reverse('forum:create')
+    threads_num = Thread.objects.count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    threads_num_after = Thread.objects.count()
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert threads_num == threads_num_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+    
