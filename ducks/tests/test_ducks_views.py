@@ -37,3 +37,13 @@ def test_add_duck_post(client, db, user, image):
     assert response.status_code == 200
     assert duck_counter == duck_counted_after - 1
     assert added_duck.name == data['name']
+
+
+def test_duck_details(client, db, duck):
+    url = reverse('ducks:details', kwargs={'pk': duck.pk})
+
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert '<h3 class="p-2 border-bottom border-black">Test Duck</h3>' in response.content.decode('utf-8')
+    

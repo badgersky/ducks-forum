@@ -4,6 +4,7 @@ import pytest
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+from ducks.models import Duck
 from forum.models import Thread, Comment
 
 
@@ -57,3 +58,23 @@ def image():
     img = Image.new("RGB", (100, 100))
     img.save(bts, 'jpeg')
     return SimpleUploadedFile("test.jpg", bts.getvalue())
+
+
+@pytest.fixture
+def duck(db, user, image):
+    """Duck instance"""
+
+    duck = Duck.objects.create(
+        name='test duck',
+        description='test duck description',
+        origin_country='test country',
+        user=user,
+        image=image,
+        avg_weight=3.4,
+        strength=3.4,
+        intelligence=3.4,
+        agility=3.4,
+        charisma=3.4,
+    )
+
+    return duck
