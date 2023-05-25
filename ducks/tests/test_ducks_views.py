@@ -79,4 +79,15 @@ def test_delete_fav_duck(client, db, user, duck):
     assert response.status_code == 200
     assert redirect.status_code == 302
     assert fav_ducks_num == fav_ducks_num_after + 1
-    
+
+
+def test_add_duck_no_permission(client, db):
+    redirect, response = _test_not_logged_user(client, reverse('ducks:add'))
+
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def _test_not_logged_user(client, url):
+    redirect = client.get(url)
+    response = client.get(redirect.url)
+    return redirect, response
