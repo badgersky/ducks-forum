@@ -1,5 +1,7 @@
 from django.urls import reverse
 
+from conftest import _test_not_logged_user
+
 
 def test_registration_get(db, client):
     url = reverse('users:register')
@@ -87,19 +89,7 @@ def test_delete_fav_duck(client, db, user, duck):
     assert fav_ducks_num == fav_ducks_num_after + 1
 
 
-def test_add_duck_no_permission(client, db):
-    redirect, response = _test_not_logged_user(client, reverse('ducks:add'))
-
-    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
-
-
 def test_add_fav_duck_no_permission(client, db, duck):
     redirect, response = _test_not_logged_user(client, reverse('users:add-fav-duck', kwargs={'pk': duck.pk}))
 
     assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
-
-
-def _test_not_logged_user(client, url):
-    redirect = client.get(url)
-    response = client.get(redirect.url)
-    return redirect, response

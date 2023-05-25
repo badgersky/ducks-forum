@@ -78,3 +78,9 @@ def duck(db, user, image):
     )
 
     return duck
+
+
+def _test_not_logged_user(client, url):
+    redirect = client.get(url)
+    response = client.get(redirect.url)
+    return redirect, response

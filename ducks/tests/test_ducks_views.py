@@ -1,6 +1,7 @@
 from django.urls import reverse
 
-from ducks.models import Duck
+from conftest import _test_not_logged_user
+from ducks.models import Duck, DuckRate
 
 
 def test_add_duck_get(client, db, user):
@@ -46,3 +47,27 @@ def test_duck_details(client, db, duck):
 
     assert response.status_code == 200
     assert '<h3 class="p-2 border-bottom border-black">Test Duck</h3>' in response.content.decode('utf-8')
+
+
+def test_rate_duck(client, db, duck, user):
+    url = reverse('ducks:rate', kwargs={'pk': duck.pk})
+    client.force_login(user)
+    data = {
+        'rate': 10,
+    }
+    num_of_rates = DuckRate.objects.filter(duck=duck).count()
+
+    redirect = client.post(url, data)
+    num_of_rates_after = DuckRate.objects.filter(duck=duck).count()
+
+    response = client.get(redirect.url)
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert num_of_rates == num_of_rates_after - 1
+
+
+def test_add_duck_no_permission(client, db):
+    redirect, response = _test_not_logged_user(client, reverse('ducks:add'))
+
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
