@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from conftest import _test_not_logged_user
 from forum.models import Thread, Comment, LikeThread, LikeComment
 
 
@@ -80,3 +81,15 @@ def test_like_comment(client, db, user, thread, comment):
     assert likes_before == likes_after - 1
     assert redirect.status_code == 302
     assert response.status_code == 200
+
+
+def test_like_comment_no_permission(client, db, thread, comment):
+    url = reverse('forum:like-comment', kwargs={'thr_pk': thread.pk, 'com_pk': comment.pk})
+    likes_before = LikeComment.objects.filter(comment=comment).count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    likes_after = LikeComment.objects.filter(comment=comment).count()
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert likes_before == likes_after

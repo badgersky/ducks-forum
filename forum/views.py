@@ -100,6 +100,7 @@ class DeleteCommentView(LoginRequiredMixin, CommentCreatorRequiredMixin, DeleteV
 
 class LikeCommentView(LoginRequiredMixin, View):
     """View checks if comment is already liked and increments number of likes"""
+    login_url = reverse_lazy('users:login')
 
     def get(self, request, thr_pk, com_pk):
         try:
@@ -139,6 +140,7 @@ class LikeCommentView(LoginRequiredMixin, View):
 
 class LikeThreadView(LoginRequiredMixin, View):
     """View checks if thread is already liked and increments number of likes"""
+    login_url = reverse_lazy('users:login')
 
     def get(self, request, pk):
         try:
