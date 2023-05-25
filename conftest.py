@@ -1,5 +1,10 @@
-import pytest
+from io import BytesIO
 
+import pytest
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+from ducks.models import Duck
 from forum.models import Thread, Comment
 
 
@@ -43,3 +48,39 @@ def comment(db, client, user, thread):
     )
 
     return comment
+
+
+@pytest.fixture
+def image():
+    """temporary image object"""
+
+    bts = BytesIO()
+    img = Image.new("RGB", (100, 100))
+    img.save(bts, 'jpeg')
+    return SimpleUploadedFile("test.jpg", bts.getvalue())
+
+
+@pytest.fixture
+def duck(db, user, image):
+    """Duck instance"""
+
+    duck = Duck.objects.create(
+        name='test duck',
+        description='test duck description',
+        origin_country='test country',
+        user=user,
+        image=image,
+        avg_weight=3.4,
+        strength=3.4,
+        intelligence=3.4,
+        agility=3.4,
+        charisma=3.4,
+    )
+
+    return duck
+
+
+def _test_not_logged_user(client, url):
+    redirect = client.get(url)
+    response = client.get(redirect.url)
+    return redirect, response
