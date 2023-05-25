@@ -63,4 +63,20 @@ def test_add_fav_duck(client, db, duck, user):
     assert response.status_code == 200
     assert fav_ducks_num == fav_ducks_num_after - 1
     assert fav_duck.name == duck.name
+
+
+def test_delete_fav_duck(client, db, user, duck):
+    user.fav_ducks.add(duck)
+    url = reverse('users:del-fav-duck', kwargs={'pk': duck.pk})
+    client.force_login(user)
+    fav_ducks_num = user.fav_ducks.count()
+
+    redirect = client.get(url)
+    fav_ducks_num_after = user.fav_ducks.count()
+
+    response = client.get(redirect.url)
+
+    assert response.status_code == 200
+    assert redirect.status_code == 302
+    assert fav_ducks_num == fav_ducks_num_after + 1
     
