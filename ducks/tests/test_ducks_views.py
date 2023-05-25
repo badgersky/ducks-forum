@@ -46,4 +46,21 @@ def test_duck_details(client, db, duck):
 
     assert response.status_code == 200
     assert '<h3 class="p-2 border-bottom border-black">Test Duck</h3>' in response.content.decode('utf-8')
+
+
+def test_add_fav_duck(client, db, duck, user):
+    url = reverse('users:add-fav-duck', kwargs={'pk': duck.pk})
+    client.force_login(user)
+    fav_ducks_num = user.fav_ducks.count()
+
+    redirect = client.get(url)
+    fav_ducks_num_after = user.fav_ducks.count()
+    fav_duck = user.fav_ducks.first()
+
+    response = client.get(redirect.url)
+
+    assert redirect.status_code == 302
+    assert response.status_code == 200
+    assert fav_ducks_num == fav_ducks_num_after - 1
+    assert fav_duck.name == duck.name
     
