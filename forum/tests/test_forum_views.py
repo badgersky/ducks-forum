@@ -93,3 +93,17 @@ def test_like_comment_no_permission(client, db, thread, comment):
     assert redirect.status_code == 302
     assert response.status_code == 200
     assert likes_before == likes_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
+
+
+def test_like_thread_no_permission(client, db, thread):
+    url = reverse('forum:like-thread', kwargs={'pk': thread.pk})
+    likes_before = LikeThread.objects.filter(thread=thread).count()
+
+    redirect, response = _test_not_logged_user(client, url)
+    likes_after = LikeThread.objects.filter(thread=thread).count()
+
+    assert response.status_code == 200
+    assert redirect.status_code == 302
+    assert likes_before == likes_after
+    assert '<h2 class="border-bottom border-top border-black p-2">Login</h2>' in response.content.decode('utf-8')
