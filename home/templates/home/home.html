@@ -13,7 +13,7 @@
         <h2 class="border-bottom border-top border-black p-2">Most popular threads</h2>
     </div>
     <br>
-    {% for thread in threads %}
+    {% for thread in page_obj %}
         <div class="card align-content-lg-start bg-burlywood m-2">
             <h5 class="card-header">{{ thread.subject }}</h5>
             <div class="card-body">
@@ -25,4 +25,38 @@
     {% empty %}
         <h4>No threads</h4>
     {% endfor %}
+    <br>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item bg-burlywood">
+                    <a class="page-link bg-burlywood text-black" href="?page={{ page_obj.previous_page_number }}">
+                        &laquo;
+                    </a>
+                </li>
+                <li class="page-item bg-burlywood">
+                    <a class="page-link bg-burlywood text-black" href="?page={{ page_obj.previous_page_number }}">
+                        {{ page_obj.previous_page_number }}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="page-item bg-burlywood">
+                <a class="page-link text-black" href="?page={{ page_obj.number }}">
+                    {{ page_obj.number }}
+                </a>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item bg-burlywood">
+                    <a class="page-link bg-burlywood text-black" href="?page={{ page_obj.next_page_number }}">
+                        {{ page_obj.next_page_number }}
+                    </a>
+                </li>
+                <li class="page-item bg-burlywood">
+                    <a class="page-link bg-burlywood text-black" href="?page={{ page_obj.next_page_number }}">
+                        &raquo;
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}
