@@ -4,7 +4,7 @@ from django.db.models import F, Sum
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 
 from ducks.forms import AddDuckForm, RateDuckForm, EditDuckForm
 from ducks.models import Duck, DuckRate
@@ -50,27 +50,26 @@ class ListDucksView(ListView):
     context_object_name = 'ducks'
 
 
-class DuckDetailsView(View):
+class DuckDetailsView(DetailView):
     """displays details about a duck"""
 
-    def get(self, request, pk):
-        try:
-            duck = Duck.objects.get(pk=pk)
-        except Duck.DoesNotExist:
-            messages.add_message(request,
-                                 messages.WARNING,
-                                 f'Sorry, we lost this duck')
+    model = Duck
+    template_name = 'ducks/duck-details.html'
+    context_object_name = 'duck'
 
-            return redirect(reverse('home:home'))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        duck = context.get('duck')
 
         owner = False
         favorite = False
-
-        if request.user.is_authenticated:
-            if request.user.pk == duck.user.pk or request.user.is_superuser:
+        if self.request.user.is_authenticated:
+            if self.request.user.pk == duck.user.pk or self.request.user.is_superuser:
                 owner = True
-            if duck in request.user.fav_ducks.all():
+            if duck in self.request.user.fav_ducks.all():
                 favorite = True
+        context['owner'] = owner
+        context['favorite'] = favorite
 
         rates = DuckRate.objects.filter(duck=duck)
         if rates:
@@ -79,20 +78,17 @@ class DuckDetailsView(View):
             duck_rate = round(duck_rate, 1)
         else:
             duck_rate = 0
+        context['rate'] = duck_rate
 
         overall_stats = (duck.strength + duck.agility + duck.intelligence + duck.charisma) / 4
         overall_stats = round(overall_stats, 1)
+        context['overall'] = overall_stats
 
         rate_form = RateDuckForm()
+        context['form'] = rate_form
 
-        return render(request, 'ducks/duck-details.html', {'duck': duck,
-                                                           'owner': owner,
-                                                           'overall': overall_stats,
-                                                           'form': rate_form,
-                                                           'rate': duck_rate,
-                                                           'favorite': favorite,
-                                                           })
-
+        return context
+    
 
 class EditDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, UpdateView):
     """View for editing duck"""
