@@ -20,6 +20,8 @@
                     <a href="{% url 'ducks:details' pk=duck.id %}" class="btn btn-brown">{{ duck.name.title }}</a>
                 </div>
             </div>
+        {% empty %}
+            <h4>No Ducks</h4>
         {% endfor %}
     </div>
     <br>
