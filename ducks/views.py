@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
@@ -88,7 +88,7 @@ class DuckDetailsView(DetailView):
         context['form'] = rate_form
 
         return context
-    
+
 
 class EditDuckView(LoginRequiredMixin, DuckCreatorRequiredMixin, UpdateView):
     """View for editing duck"""
