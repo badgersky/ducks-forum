@@ -47,15 +47,7 @@ class ListDucksView(ListView):
 
     model = Duck
     template_name = 'ducks/list-ducks.html'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data()
-
-        ducks = Duck.objects.all()
-        num_of_ducks = ducks.count()
-        context['duck_table'] = [ducks[i:i + 3] for i in range(0, num_of_ducks, 3)]
-
-        return context
+    context_object_name = 'ducks'
 
 
 class DuckDetailsView(View):

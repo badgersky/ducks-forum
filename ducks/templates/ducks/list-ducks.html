@@ -12,16 +12,14 @@
     <div class="row">
         <h2 class="border-bottom border-top border-black p-2">All Ducks</h2>
     </div>
-    {% for row in duck_table %}
-        <div class="row justify-content-sm-start mt-5 mb-5">
-            {% for duck in row %}
-                <div class="justify-content-center" style="width: 18rem;">
-                    <img src="{{ duck.image.url }}" class="img-duck-list" alt="{{ duck.name }}">
-                    <div class="card-body mt-2">
-                        <a href="{% url 'ducks:details' pk=duck.id %}" class="btn btn-brown">{{ duck.name.title }}</a>
-                    </div>
+    <div class="row justify-content-evenly mt-5 mb-5">
+        {% for duck in ducks %}
+            <div class="justify-content-center mt-4" style="width: 18rem;">
+                <img src="{{ duck.image.url }}" class="img-duck-list" alt="{{ duck.name }}">
+                <div class="card-body mt-2">
+                    <a href="{% url 'ducks:details' pk=duck.id %}" class="btn btn-brown">{{ duck.name.title }}</a>
                 </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
