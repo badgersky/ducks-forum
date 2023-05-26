@@ -48,6 +48,7 @@ class ListDucksView(ListView):
     model = Duck
     template_name = 'ducks/list-ducks.html'
     context_object_name = 'ducks'
+    paginate_by = 2
 
 
 class DuckDetailsView(DetailView):
