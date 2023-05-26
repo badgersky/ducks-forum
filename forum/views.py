@@ -15,6 +15,7 @@ class DisplayThreadsView(ListView):
     model = Thread
     template_name = 'forum/list-threads.html'
     context_object_name = 'threads'
+    paginate_by = 20
 
 
 class CreateThreadView(LoginRequiredMixin, CreateView):
