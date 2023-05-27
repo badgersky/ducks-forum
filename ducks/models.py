@@ -38,6 +38,9 @@ class Duck(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('-date_at',)
+        
 
 class DuckRate(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
